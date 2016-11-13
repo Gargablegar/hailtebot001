@@ -26,22 +26,58 @@ myID, gameMap = getInit()
 # logging.info('Ayylmao_lets')
 
 
-sendInit("Ayylmao_lets go>east/WEST")
+sendInit("ROFL_eastWEST")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
 
+# class possibleMoves:
+#     def __init__(self, gameMap, location):
+#         self.gameMap = gameMap
+#         self.lcoation = location
+#     """Class that returns """
+
+    # #Nearest weakest ally
+    # directionWeakAlly
+    # #Nearest weakest enemy
+    # directionWeakEnemy
+
+    # #Highest neighbouring Enemy Production
+    # directionHighEnemyProd
+    
+    # #Highest neighbouring Friendly Production
+    # directionHighFriendlyProd
+    
 def move(location):
     site = gameMap.getSite(location)
+
+    #Move init
+    # possibleMoves
+
+    # Is in Squad Check
     SquadFlag = IsSquad(location)
-# IF max strength go to lowest square
+    # SquadOrders
+    
+
+    #IF max strength go to lowest square
+    if site.strength >=250:
+        # return Move(location, lowestEnemyNeighbour(gameMap,location))
+        return Move(location, SquadMove)
+     #    # GOTO weakest Ally or Enemy
+     #    return Move(location,WEST)
+    
+     # Wait till Friendly block is at a level of the local prodction 
+     # !!! RND 4
     if site.strength < site.production + 4:
+        logging.info(site.strength)
+        logging.info(site.production) 
         return Move(location, STILL)
-    if SquadFlag == False and site.strength > 50:
+
+    if SquadFlag == False and site.strength > 70:
         # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
-        return Move(location,RndDirection())   
+        return Move(location,lowestEnemyNeighbour(gameMap,location))   
     if SquadFlag == True and site.strength > 50:
-        return Move(location,WEST)   
+        return Move(location, SquadMove)   
 
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
@@ -49,32 +85,38 @@ def move(location):
         if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
             return Move(location, d)
         else: 
-            return Move(location, EAST if random.random() > 0.65 else STILL)
+            # return Move(location, SquadMove)
+            return Move(location,lowestNeighbour(gameMap,location))
+            # return Move(location, EAST if random.random() > 0.65 else STILL)
 
     return Move(location, NORTH if random.random() > 0.5 else SOUTH)
 
-def lowestNeighbour(location):
-    min = 255
+def lowestNeighbour(gameMap,location):
+    minimium = 255
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
-        if neighbour_site.strength < (min):
-            min = neighbour_site.strength
+        if neighbour_site.strength < (minimium):
+            minimium = neighbour_site.strength
             direction = d 
             # return Move(location, d)
+    if minimium == 255:
+        return RndDirection()
     return direction
 
-def lowestEnemyNeighbour(location):
-    min = 255
+def lowestEnemyNeighbour(gameMap,location):
+    minimium = 255
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
-        if neighbour_site.owner != myID and neighbour_site.strength < (min):
-            min = neighbour_site.strength
+        if neighbour_site.owner != myID and neighbour_site.strength < (minimium):
+            minimium = neighbour_site.strength
             direction = d 
             # return Move(location, d)
+        else:
+            direction = RndDirection()
     return direction
-    
+
 def RndDirection():
     i = randint(1,4)
     if i == 1:
@@ -92,20 +134,21 @@ def IsSquad(location):
     squadCount = 1;
     for d in CARDINALS:
             neighbour_site = gameMap.getSite(location, d)
-            if neighbour_site.owner == myID and neighbour_site.strength > 40:
+            if neighbour_site.owner == myID and neighbour_site.strength > 50:
                 squadCount = squadCount + 1
-    if squadCount >= 3:
-        return True            
+    if squadCount >= randint(2,3):
+        return True
     return False
-
 
 while True:
     moves = []
     gameMap = getFrame()
+    SquadMove = (WEST if random.random() > 0.40 else SOUTH)
 
     for y in range(gameMap.height):
         for x in range(gameMap.width):
             location = Location(x, y)
             if gameMap.getSite(location).owner == myID:
+
                 moves.append(move(location))
     sendFrame(moves)
