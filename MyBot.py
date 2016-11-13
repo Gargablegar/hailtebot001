@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 logging.warning('Watch out!')  # will print a message to the console
 logging.info('I told you so')  # will not print anything
-logging.info(CARDINALS) 
+# logging.info(CARDINALS) 
 
 myID, gameMap = getInit()
 # Initialise
@@ -26,7 +26,7 @@ myID, gameMap = getInit()
 # logging.info('Ayylmao_lets')
 
 
-sendInit("ROFL_eastWEST")
+sendInit("ROFL_SouthWest")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
@@ -50,7 +50,8 @@ sendInit("ROFL_eastWEST")
     
 def move(location):
     site = gameMap.getSite(location)
-
+    # logging.info('PROD')
+    # logging.info(site.production) 
     #Move init
     # possibleMoves
 
@@ -61,16 +62,15 @@ def move(location):
 
     #IF max strength go to lowest square
     if site.strength >=250:
-        # return Move(location, lowestEnemyNeighbour(gameMap,location))
-        return Move(location, SquadMove)
+        return Move(location, lowestEnemyNeighbour(gameMap,location))
+        # return Move(location, SquadMove)
      #    # GOTO weakest Ally or Enemy
      #    return Move(location,WEST)
     
      # Wait till Friendly block is at a level of the local prodction 
      # !!! RND 4
     if site.strength < site.production + 4:
-        logging.info(site.strength)
-        logging.info(site.production) 
+
         return Move(location, STILL)
 
     if SquadFlag == False and site.strength > 70:
@@ -82,11 +82,11 @@ def move(location):
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
-        if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
+        if neighbour_site.owner != myID and neighbour_site.strength < (site.strength + randint(-10,10)):
             return Move(location, d)
         else: 
             # return Move(location, SquadMove)
-            return Move(location,lowestNeighbour(gameMap,location))
+            return Move(location,(lowestNeighbour(gameMap,location) if random.random() > 0.75 else STILL))
             # return Move(location, EAST if random.random() > 0.65 else STILL)
 
     return Move(location, NORTH if random.random() > 0.5 else SOUTH)
@@ -102,10 +102,13 @@ def lowestNeighbour(gameMap,location):
             # return Move(location, d)
     if minimium == 255:
         return RndDirection()
+    if minimium == 0:
+        return STILL
     return direction
 
 def lowestEnemyNeighbour(gameMap,location):
     minimium = 255
+    # productionValue = 5
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
@@ -113,8 +116,8 @@ def lowestEnemyNeighbour(gameMap,location):
             minimium = neighbour_site.strength
             direction = d 
             # return Move(location, d)
-        else:
-            direction = RndDirection()
+    else:
+        direction = SquadMove
     return direction
 
 def RndDirection():
