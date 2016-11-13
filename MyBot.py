@@ -2,13 +2,27 @@ from hlt import *
 from networking import *
 
 myID, gameMap = getInit()
-sendInit("MyPythonBot")
+sendInit("Ayylmao")
+# https://halite.io/basics_improve_random.php
+
+# Move function, that does not move if at 0 strength
+
+def move(location):
+    site = gameMap.getSite(location)
+    for d in CARDINALS:
+        neighbour_site = gameMap.getSite(location, d)
+        if neighbour_site.owner != myID and neighbour_site.strength < site.strength:
+            return Move(location, d)
+    if site.strength < site.production * 5:
+        return Move(location, STILL)
+    return Move(location, NORTH if random.random() > 0.5 else WEST)
 
 while True:
     moves = []
     gameMap = getFrame()
     for y in range(gameMap.height):
         for x in range(gameMap.width):
-            if gameMap.getSite(Location(x, y)).owner == myID:
-                moves.append(Move(Location(x, y), int(random.random() * 5)))
+            location = Location(x, y)
+            if gameMap.getSite(location).owner == myID:
+                moves.append(move(location))
     sendFrame(moves)
