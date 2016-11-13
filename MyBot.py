@@ -10,7 +10,23 @@ logging.info('I told you so')  # will not print anything
 logging.info(CARDINALS) 
 
 myID, gameMap = getInit()
-sendInit("Ayylmao")
+# Initialise
+# w = gameMap.width
+# y = gameMap.height
+# ProducitonMatrix = [[0 for x in range(w)] for y in range(h)] 
+# for y in range(gameMap.height):
+#     for x in range(gameMap.width):
+#         location = Location(x, y)
+#         site = gameMap.getSite(location)
+#         ProducitonMatrix[x][y] = site.production
+#         # if gameMap.getSite(location).owner == myID:
+#         #     moves.append(move(location))
+
+# logging.info(ProducitonMatrix)
+# logging.info('Ayylmao_lets')
+
+
+sendInit("Ayylmao_lets go>east/WEST")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
@@ -18,24 +34,47 @@ sendInit("Ayylmao")
 def move(location):
     site = gameMap.getSite(location)
     SquadFlag = IsSquad(location)
-
+# IF max strength go to lowest square
     if site.strength < site.production + 4:
         return Move(location, STILL)
-    if SquadFlag == False and site.strength > 70:
+    if SquadFlag == False and site.strength > 50:
         # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
         return Move(location,RndDirection())   
-    if SquadFlag == True and site.strength > 70:
-        return Move(location,EAST)   
+    if SquadFlag == True and site.strength > 50:
+        return Move(location,WEST)   
 
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
+        # make go to lowest square!!! TODO
         if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
             return Move(location, d)
         else: 
-            return Move(location, STILL)
+            return Move(location, EAST if random.random() > 0.65 else STILL)
 
-    return Move(location, NORTH if random.random() > 0.5 else WEST)
+    return Move(location, NORTH if random.random() > 0.5 else SOUTH)
 
+def lowestNeighbour(location):
+    min = 255
+    for d in CARDINALS:
+        neighbour_site = gameMap.getSite(location, d)
+        # make go to lowest square!!! TODO
+        if neighbour_site.strength < (min):
+            min = neighbour_site.strength
+            direction = d 
+            # return Move(location, d)
+    return direction
+
+def lowestEnemyNeighbour(location):
+    min = 255
+    for d in CARDINALS:
+        neighbour_site = gameMap.getSite(location, d)
+        # make go to lowest square!!! TODO
+        if neighbour_site.owner != myID and neighbour_site.strength < (min):
+            min = neighbour_site.strength
+            direction = d 
+            # return Move(location, d)
+    return direction
+    
 def RndDirection():
     i = randint(1,4)
     if i == 1:
@@ -50,10 +89,10 @@ def RndDirection():
 
 def IsSquad(location):
     site = gameMap.getSite(location)
-    squadCount = 0;
+    squadCount = 1;
     for d in CARDINALS:
             neighbour_site = gameMap.getSite(location, d)
-            if neighbour_site.owner == myID and neighbour_site.strength > 70:
+            if neighbour_site.owner == myID and neighbour_site.strength > 40:
                 squadCount = squadCount + 1
     if squadCount >= 3:
         return True            
