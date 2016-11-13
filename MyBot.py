@@ -139,14 +139,14 @@ def IsSquad(location):
             neighbour_site = gameMap.getSite(location, d)
             if neighbour_site.owner == myID and neighbour_site.strength > 50:
                 squadCount = squadCount + 1
-    if squadCount >= randint(2,3):
+    if squadCount >= randint(3,4):
         return True
     return False
 
 while True:
     moves = []
     gameMap = getFrame()
-    SquadMove = (WEST if random.random() > 0.40 else SOUTH)
+    SquadMove = (WEST if random.random() > 0.30 else SOUTH)
 
     for y in range(gameMap.height):
         for x in range(gameMap.width):
