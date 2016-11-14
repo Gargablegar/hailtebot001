@@ -52,11 +52,13 @@ def move(location):
     site = gameMap.getSite(location)
     # logging.info('PROD')
     # logging.info(site.production) 
+    logging.info('Strangth') 
+    logging.info(site.strength) 
     #Move init
     # possibleMoves
 
     # Is in Squad Check
-    SquadFlag = IsSquad(location)
+    SquadFlag = IsSquad(gameMap,location)
     # SquadOrders
     
 
@@ -69,13 +71,14 @@ def move(location):
     
      # Wait till Friendly block is at a level of the local prodction 
      # !!! RND 4
-    if site.strength < site.production + 4:
+    if site.strength < site.production + 6:
 
         return Move(location, STILL)
 
     if SquadFlag == False and site.strength > 70:
-        # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
-        return Move(location,lowestEnemyNeighbour(gameMap,location))   
+        # return Move(location, EAST if random.random() > 0.5 else SOUTH)  
+        return Move(location, SquadMoveOpp) 
+        # return Move(location,lowestEnemyNeighbour(gameMap,location))   
     if SquadFlag == True and site.strength > 50:
         return Move(location, SquadMove)   
 
@@ -86,10 +89,11 @@ def move(location):
             return Move(location, d)
         else: 
             # return Move(location, SquadMove)
-            return Move(location,(lowestNeighbour(gameMap,location) if random.random() > 0.75 else STILL))
+            return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
             # return Move(location, EAST if random.random() > 0.65 else STILL)
 
-    return Move(location, NORTH if random.random() > 0.5 else SOUTH)
+    # return Move(location, NORTH if random.random() > 0.5 else SOUTH)
+    return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
 
 def lowestNeighbour(gameMap,location):
     minimium = 255
@@ -117,7 +121,7 @@ def lowestEnemyNeighbour(gameMap,location):
             direction = d 
             # return Move(location, d)
     else:
-        direction = SquadMove
+        direction = SquadMoveOpp
     return direction
 
 def RndDirection():
@@ -132,7 +136,7 @@ def RndDirection():
         return WEST
     return STILL
 
-def IsSquad(location):
+def IsSquad(gameMap,location):
     site = gameMap.getSite(location)
     squadCount = 1;
     for d in CARDINALS:
@@ -143,15 +147,33 @@ def IsSquad(location):
         return True
     return False
 
+# def SpecialSquad(location):
+#     site = gameMap.getSite(location)
+#     squadCount = 1;
+#     for d in CARDINALS:
+#             neighbour_site = gameMap.getSite(location, d)
+#             if neighbour_site.owner == myID and neighbour_site.strength > 50:
+#                 squadCount = squadCount + 1
+#     if squadCount >= randint(3,4):
+#         return True
+#     return False
+
 while True:
     moves = []
     gameMap = getFrame()
     SquadMove = (WEST if random.random() > 0.30 else SOUTH)
-
+    
+    if SquadMove == WEST:
+        SquadMoveOpp = EAST
+    if SquadMove ==SOUTH:
+        SquadMoveOpp = NORTH
+    
+    SquadMoveOrigional = SquadMove
+    
     for y in range(gameMap.height):
         for x in range(gameMap.width):
             location = Location(x, y)
             if gameMap.getSite(location).owner == myID:
-
+                # SquadMove = (SquadMoveOrigional if random.random() > 0.15 else (North if random.random() > 0.30 else WEST))
                 moves.append(move(location))
     sendFrame(moves)
