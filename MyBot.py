@@ -25,7 +25,7 @@ myID, gameMap = getInit()
 # logging.info(ProducitonMatrix)
 # logging.info('Ayylmao_lets')
 
-sendInit("ROFL_SouthWest")
+sendInit("Knock_Knock_Neighbour")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
