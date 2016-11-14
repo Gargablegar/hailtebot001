@@ -25,7 +25,6 @@ myID, gameMap = getInit()
 # logging.info(ProducitonMatrix)
 # logging.info('Ayylmao_lets')
 
-
 sendInit("ROFL_SouthWest")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
@@ -52,8 +51,8 @@ def move(location):
     site = gameMap.getSite(location)
     # logging.info('PROD')
     # logging.info(site.production) 
-    logging.info('Strangth') 
-    logging.info(site.strength) 
+    # logging.info('Strangth') 
+    # logging.info(site.strength) 
     #Move init
     # possibleMoves
 
@@ -95,8 +94,13 @@ def move(location):
     # return Move(location, NORTH if random.random() > 0.5 else SOUTH)
     return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
 
+# Checks for lowest Friednyl neighbour - 
 def lowestNeighbour(gameMap,location):
     minimium = 255
+
+    # site could be a global var to reduce re calculation of this
+    site = gameMap.getSite(location)
+    
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
@@ -106,12 +110,15 @@ def lowestNeighbour(gameMap,location):
             # return Move(location, d)
     if minimium == 255:
         return RndDirection()
-    if minimium == 0:
+    if minimium < site.production + 3:
         return STILL
     return direction
 
+# Checks for lowest Enemy piece on cardinal points, if none - moves to loves neighbour
 def lowestEnemyNeighbour(gameMap,location):
-    minimium = 255
+    minimium = 260
+    # site could be a global var to reduce re calculation of this
+    site = gameMap.getSite(location)
     # productionValue = 5
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
@@ -120,8 +127,10 @@ def lowestEnemyNeighbour(gameMap,location):
             minimium = neighbour_site.strength
             direction = d 
             # return Move(location, d)
-    else:
-        direction = SquadMoveOpp
+    # if minimium == 255:     
+    #     return RndDirection()
+    if minimium == 260:
+        direction = lowestNeighbour(gameMap,location)
     return direction
 
 def RndDirection():
@@ -136,6 +145,7 @@ def RndDirection():
         return WEST
     return STILL
 
+# Checks to see if in a combat grouping of sorts
 def IsSquad(gameMap,location):
     site = gameMap.getSite(location)
     squadCount = 1;
@@ -143,7 +153,8 @@ def IsSquad(gameMap,location):
             neighbour_site = gameMap.getSite(location, d)
             if neighbour_site.owner == myID and neighbour_site.strength > 50:
                 squadCount = squadCount + 1
-    if squadCount >= randint(3,4):
+    
+    if squadCount >= randint(3,5):
         return True
     return False
 
@@ -161,6 +172,7 @@ def IsSquad(gameMap,location):
 while True:
     moves = []
     gameMap = getFrame()
+
     SquadMove = (WEST if random.random() > 0.30 else SOUTH)
     
     if SquadMove == WEST:
