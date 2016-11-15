@@ -2,6 +2,19 @@ from hlt import *
 from networking import *
 from random import randint
 
+
+print ('A' if random.random() > 0.5 else 'S')
+print ('A' if random.random() > 0.5 else 'S')
+print ('A' if random.random() > 0.5 else 'S')
+print ('A' if random.random() > 0.5 else 'S')
+
+print ('STILL' if random.random() > 0.25 else randint(1,4))
+print ('STILL' if random.random() > 0.25 else randint(1,4))
+print ('STILL' if random.random() > 0.25 else randint(1,4))
+print ('STILL' if random.random() > 0.25 else randint(1,4))
+
+
+print '===================='
 print CARDINALS[1]
 print random.random()
 x = 1
@@ -20,4 +33,3 @@ productionField = [[0 for x in range(W)] for y in range(H)]
 
 print productionField
 
-for y in range(s):

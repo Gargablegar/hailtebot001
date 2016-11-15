@@ -25,12 +25,14 @@ for y in range(gameMap.height):
 
 productionMax = 0
 productionMaxLocation = Location(1,1)
-for y in range(spawnPoint.y,spawnPoint.y+5):
-    for x in range(spawnPoint.x,spawnPoint.x+5):
+for y in range(spawnPoint.y,spawnPoint.y+8):
+    for x in range(spawnPoint.x,spawnPoint.x+8):
         location = Location(x, y)
         if gameMap.getSite(location).production > productionMax:
             productionMax = gameMap.getSite(location).production
-            productionMaxLocation = location
+            productionMaxLocation = Location(location.x, location.y)
+
+# productionMaxLocation = Location(spawnPoint.x+3,spawnPoint.y+3)
 logging.info('Spawn Point')
 logging.info(spawnPoint.x)
 logging.info(spawnPoint.y)
@@ -78,7 +80,7 @@ sendInit("MaxProd5x5From spawn")
 def directionAtoB(locationA,locationB):
     Xdist = locationB.x - locationA.x
     Ydist = locationB.y - locationA.y
-    if Xdist<= Ydist:
+    if (Xdist<= Ydist) and Xdist != 0 or Ydist ==0:
         # X stuff
         direction = EAST
     else:
@@ -89,7 +91,13 @@ def directionAtoB(locationA,locationB):
     return direction 
 
 def move(location):
-
+    # Flag blocks as Scout,Production, Defensive, Offensive
+    # use MapInit to figure out best path to production, and through lowest strength
+    # When hit production assign blocks to Prod
+    # Blocks of a certain size become defensive 
+    # Block on edge with a squad, or that are in a squad under attack become offensive. 
+    # Remark blocks once complete. 
+    
     site = gameMap.getSite(location)
     # logging.info('PROD')
     # logging.info(site.production) 
@@ -97,19 +105,50 @@ def move(location):
     # logging.info(site.strength) 
     #Move init
     # possibleMoves
-    # Is MAX PRODUCTION 
-    if location == productionMaxLocation:
-        if site.strength ==255:
-            return Move(location,randint(1,4))
-        return Move(location, STILL)
 
+    if site.strength < site.production + 5:
+        return Move(location, STILL)
+    
+    # Is on Max Production Point? 
+    # logging.info('Production Max Location')
+    # logging.info(productionMaxLocation.x)
+    # logging.info(productionMaxLocation.y)
+    # logging.info('Location Location')
+    # logging.info(location.x)
+    # logging.info(location.y)
+    if (location.x == productionMaxLocation.x) and (location.y == productionMaxLocation.y) :
+        if site.strength >=150:
+            # return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
+            return Move(location,(lowestEnemyNeighbour(gameMap,location)))
+        else:
+            return Move(location, STILL)
+    
+    elif location.x == productionMaxLocation.x+1 and location.y == productionMaxLocation.y:
+        if site.strength >=150:
+            return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
+        else:
+            return Move(location, STILL)
+    elif location.x == productionMaxLocation.x-1 and location.y == productionMaxLocation.y:
+        if site.strength >=150:
+            return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
+        else:
+            return Move(location, STILL)
+    elif location.x == productionMaxLocation.x and location.y == productionMaxLocation.y+1:
+        if site.strength >=150:
+            return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
+        else:
+            return Move(location, STILL)
+    elif location.x == productionMaxLocation.x and location.y == productionMaxLocation.y-1:
+        if site.strength >=150:
+            return Move(location,(SOUTH if random.random() > 0.05 else randint(1,4)))
+        else:
+            return Move(location, STILL)
     # # Is in Squad Check
     # SquadFlag = IsSquad(gameMap,location)
     # # SquadOrders
     
      # Wait till Friendly block is at a level of the local prodction 
-    if site.strength < site.production + 5:
-        return Move(location, STILL)
+
 
     # #If max strength go to lowest square
     # if site.strength >=250:
@@ -122,15 +161,15 @@ def move(location):
     #     return Move(location, SquadMoveOpp) 
     #     # return Move(location,lowestEnemyNeighbour(gameMap,location))  
 
-    for d in CARDINALS:
-        neighbour_site = gameMap.getSite(location, d)
-        # make go to lowest square!!! TODO
-        if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
-            return Move(location,directionAtoB(location,productionMaxLocation))
-        else: 
-            # return Move(location, SquadMove)
-            return Move(location,directionAtoB(location,productionMaxLocation))
-            # return Move(location, EAST if random.random() > 0.65 else STILL)
+    # for d in CARDINALS:
+    #     neighbour_site = gameMap.getSite(location, d)
+    #     # make go to lowest square!!! TODO
+    #     if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
+    #         return Move(location,directionAtoB(location,productionMaxLocation))
+    #     else: 
+    #         # return Move(location, SquadMove)
+    #         return Move(location,directionAtoB(location,productionMaxLocation))
+    #         # return Move(location, EAST if random.random() > 0.65 else STILL)
 
     return Move(location,directionAtoB(location,productionMaxLocation))
     

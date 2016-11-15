@@ -35,13 +35,13 @@ def move(location):
     site = gameMap.getSite(location)
     SquadFlag = IsSquad(location)
 
-    if site.strength < site.production + 4:
-        return Move(location, STILL)
-    if SquadFlag == False and site.strength > 50:
-        # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
-        return Move(location,RndDirection())   
-    if SquadFlag == True and site.strength > 50:
-        return Move(location,WEST)   
+    # if site.strength < site.production + 4:
+    #     return Move(location, STILL)
+    # if SquadFlag == False and site.strength > 50:
+    #     # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
+    #     return Move(location,RndDirection())   
+    # if SquadFlag == True and site.strength > 50:
+    #     return Move(location,WEST)   
 
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
