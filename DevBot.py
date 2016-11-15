@@ -10,9 +10,36 @@ logging.info('I told you so')  # will not print anything
 # logging.info(CARDINALS) 
 
 myID, gameMap = getInit()
-# Initialise
-# w = gameMap.width
-# y = gameMap.height
+# Initialise 
+# Find Production Field values
+# Find Spawn Point
+W = gameMap.width
+H = gameMap.height
+# productionField = [[0 for x in range(W)] for y in range(H)]
+for y in range(gameMap.height):
+        for x in range(gameMap.width):
+            location = Location(x, y)
+            # productionField[x][y] = gameMap.getSite(location).production
+            if gameMap.getSite(location).owner == myID:
+                spawnPoint = location
+
+productionMax = 0
+productionMaxLocation = Location(1,1)
+for y in range(spawnPoint.y,spawnPoint.y+5):
+    for x in range(spawnPoint.x,spawnPoint.x+5):
+        location = Location(x, y)
+        if gameMap.getSite(location).production > productionMax:
+            productionMax = gameMap.getSite(location).production
+            productionMaxLocation = location
+logging.info('Spawn Point')
+logging.info(spawnPoint.x)
+logging.info(spawnPoint.y)
+logging.info('Production Max')
+logging.info(productionMax)
+logging.info('Production Max Location')
+logging.info(productionMaxLocation.x)
+logging.info(productionMaxLocation.y)
+
 # ProducitonMatrix = [[0 for x in range(w)] for y in range(h)] 
 # for y in range(gameMap.height):
 #     for x in range(gameMap.width):
@@ -24,8 +51,7 @@ myID, gameMap = getInit()
 
 # logging.info(ProducitonMatrix)
 # logging.info('Ayylmao_lets')
-
-sendInit("Knock_Knock_Neighbour")
+sendInit("MaxProd5x5From spawn")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
@@ -46,8 +72,24 @@ sendInit("Knock_Knock_Neighbour")
     
     # #Highest neighbouring Friendly Production
     # directionHighFriendlyProd
-    
+
+# FOR A FIRST QUADERANT CASE ONLY 
+# FUCKING 0.0 on top left fuck you images
+def directionAtoB(locationA,locationB):
+    Xdist = locationB.x - locationA.x
+    Ydist = locationB.y - locationA.y
+    if Xdist<= Ydist:
+        # X stuff
+        direction = EAST
+    else:
+        # Ydist < Xdist 
+        # Y stuff
+        direction = SOUTH
+
+    return direction 
+
 def move(location):
+
     site = gameMap.getSite(location)
     # logging.info('PROD')
     # logging.info(site.production) 
@@ -55,44 +97,45 @@ def move(location):
     # logging.info(site.strength) 
     #Move init
     # possibleMoves
+    # Is MAX PRODUCTION 
+    if location == productionMaxLocation:
+        if site.strength ==255:
+            return Move(location,randint(1,4))
+        return Move(location, STILL)
 
-    # Is in Squad Check
-    SquadFlag = IsSquad(gameMap,location)
-    # SquadOrders
-    
-
-    #IF max strength go to lowest square
-    if site.strength >=250:
-        # return Move(location, lowestEnemyNeighbour(gameMap,location))
-        return Move(location, SquadMove)
-     #    # GOTO weakest Ally or Enemy
-     #    return Move(location,WEST)
+    # # Is in Squad Check
+    # SquadFlag = IsSquad(gameMap,location)
+    # # SquadOrders
     
      # Wait till Friendly block is at a level of the local prodction 
-     # !!! RND 4
-    if site.strength < site.production + 10:
+    if site.strength < site.production + 5:
         return Move(location, STILL)
-    
-    if SquadFlag == True and site.strength > 50:
-        return Move(location, SquadMove)   
-    elif SquadFlag == False and site.strength > 40:
-        # return Move(location, EAST if random.random() > 0.5 else SOUTH)  
-        return Move(location, SquadMoveOpp) 
-        # return Move(location,lowestEnemyNeighbour(gameMap,location))   
 
+    # #If max strength go to lowest square
+    # if site.strength >=250:
+    #     # return Move(location, lowestEnemyNeighbour(gameMap,location))
+    #     return Move(location, SquadMove)
+    # if SquadFlag == True and site.strength > 50:
+    #     return Move(location, SquadMove)   
+    # elif SquadFlag == False and site.strength > 40:
+    #     # return Move(location, EAST if random.random() > 0.5 else SOUTH)  
+    #     return Move(location, SquadMoveOpp) 
+    #     # return Move(location,lowestEnemyNeighbour(gameMap,location))  
 
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)
         # make go to lowest square!!! TODO
-        if neighbour_site.owner != myID and neighbour_site.strength < (site.strength + randint(-10,10)):
-            return Move(location, d)
+        if neighbour_site.owner != myID and neighbour_site.strength < (site.strength):
+            return Move(location,directionAtoB(location,productionMaxLocation))
         else: 
             # return Move(location, SquadMove)
-            return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
+            return Move(location,directionAtoB(location,productionMaxLocation))
             # return Move(location, EAST if random.random() > 0.65 else STILL)
 
-    # return Move(location, NORTH if random.random() > 0.5 else SOUTH)
-    return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
+    return Move(location,directionAtoB(location,productionMaxLocation))
+    
+    # # return Move(location, NORTH if random.random() > 0.5 else SOUTH)
+    # return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
 
 # Checks for lowest Friednyl neighbour - 
 def lowestNeighbour(gameMap,location):
@@ -136,6 +179,7 @@ def lowestEnemyNeighbour(gameMap,location):
         direction = lowestNeighbour(gameMap,location)
     return direction
 
+# This is exsessive can use HLT class or numbers to random
 def RndDirection():
     i = randint(1,4)
     if i == 1:
