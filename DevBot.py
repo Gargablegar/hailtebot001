@@ -25,8 +25,8 @@ for y in range(gameMap.height):
 
 productionMax = 0
 productionMaxLocation = Location(1,1)
-for y in range(spawnPoint.y,spawnPoint.y+8):
-    for x in range(spawnPoint.x,spawnPoint.x+8):
+for y in range(spawnPoint.y-5,spawnPoint.y+5):
+    for x in range(spawnPoint.x-5,spawnPoint.x+5):
         location = Location(x, y)
         if gameMap.getSite(location).production > productionMax:
             productionMax = gameMap.getSite(location).production
@@ -78,15 +78,36 @@ sendInit("MaxProd5x5From spawn")
 # FOR A FIRST QUADERANT CASE ONLY 
 # FUCKING 0.0 on top left fuck you images
 def directionAtoB(locationA,locationB):
-    Xdist = locationB.x - locationA.x
-    Ydist = locationB.y - locationA.y
-    if (Xdist<= Ydist) and Xdist != 0 or Ydist ==0:
-        # X stuff
+    Xdist = locationA.x - locationB.x
+    Ydist = locationA.y - locationB.y
+    if (Xdist and Ydist) < 0:
+        # Quad = 4
+        direction =( SOUTH if random.random() > 0.5 else EAST)
+    elif (Xdist and Ydist) > 0:
+        # Quad = 2
+        direction = (WEST if random.random() > 0.5 else NORTH)
+    elif Xdist > 0 and Ydist < 0:
+        # Quad = 3
+        direction = (WEST if random.random() > 0.5 else SOUTH)
+    elif Xdist < 0 and Ydist > 0:
+        # Quad = 1
+        direction =(EAST if random.random() > 0.5 else NORTH)
+    elif Xdist > 0 and Ydist ==0:
+        direction = WEST
+    elif Xdist < 0 and Ydist ==0:
         direction = EAST
-    else:
-        # Ydist < Xdist 
-        # Y stuff
+    elif Xdist == 0 and Ydist > 0:
+        direction = NORTH
+    elif Xdist == 0 and Ydist < 0:
         direction = SOUTH
+
+    # if (Xdist<= Ydist) and Xdist != 0 or Ydist ==0:
+    #     # X stuff
+    #     direction = EAST
+    # else:
+    #     # Ydist < Xdist 
+    #     # Y stuff
+    #     direction = SOUTH
 
     return direction 
 
@@ -97,7 +118,7 @@ def move(location):
     # Blocks of a certain size become defensive 
     # Block on edge with a squad, or that are in a squad under attack become offensive. 
     # Remark blocks once complete. 
-    
+
     site = gameMap.getSite(location)
     # logging.info('PROD')
     # logging.info(site.production) 
