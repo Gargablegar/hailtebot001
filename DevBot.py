@@ -10,16 +10,28 @@ logging.info('I told you so')  # will not print anything
 # logging.info(CARDINALS) 
 
 
-def productionMax(X=1,Y=1,minx=0,miny=0):
+def productionMax(X=1,Y=1,dx=5,dy=5):
     productionMax = 0
     productionMaxLocation = Location(1,1)
-    for y in range(Y-5,Y+5):
-        for x in range(X-5,X+5):
+    meanProductionMaxLocation = Location(1,1)
+    meanProduction = 0
+    meanProductionMax = 0
+    
+    for y in range(Y-dy,Y+dy):
+        for x in range(X-dx,X+dx):
             location = Location(x, y)
+            for d in CARDINALS:
+                    meanProduction = meanProduction + gameMap.getSite(location,d).production
+            meanProduction = meanProduction/5
             if gameMap.getSite(location).production > productionMax:
                 productionMax = gameMap.getSite(location).production
                 productionMaxLocation = Location(location.x, location.y)
-    return productionMaxLocation
+
+            if meanProduction > meanProductionMax:
+                meanProductionMax = meanProduction
+                meanProductionMaxLocation = Location(location.x, location.y)
+
+    return productionMaxLocation,meanProductionMaxLocation
 
 
 myID, gameMap = getInit()
@@ -36,7 +48,7 @@ for y in range(gameMap.height):
             if gameMap.getSite(location).owner == myID:
                 spawnPoint = location
 
-productionMaxLocation = productionMax(spawnPoint.x,spawnPoint.y)
+productionMaxLocation,meanProductionMaxLocation = productionMax(spawnPoint.x,spawnPoint.y)
 
 
 # productionMaxLocation = Location(spawnPoint.x+3,spawnPoint.y+3)
@@ -202,9 +214,13 @@ def move(location):
     #         # return Move(location, SquadMove)
     #         return Move(location,directionAtoB(location,productionMaxLocation))
     #         # return Move(location, EAST if random.random() > 0.65 else STILL)
+    siteProduction = gameMap.getSite(productionMaxLocation)
+    if siteProduction.owner == myID:
+        return Move(location,directionAtoB(location,meanProductionMaxLocation))
+    else:
+        return Move(location,directionAtoB(location,productionMaxLocation))
 
-    return Move(location,directionAtoB(location,productionMaxLocation))
-    
+   
     # # return Move(location, NORTH if random.random() > 0.5 else SOUTH)
     # return Move(location,(lowestEnemyNeighbour(gameMap,location) if random.random() > 0.15 else STILL))
 
