@@ -9,6 +9,19 @@ logging.warning('Watch out!')  # will print a message to the console
 logging.info('I told you so')  # will not print anything
 # logging.info(CARDINALS) 
 
+
+def productionMax(X=1,Y=1,minx=0,miny=0):
+    productionMax = 0
+    productionMaxLocation = Location(1,1)
+    for y in range(Y-5,Y+5):
+        for x in range(X-5,X+5):
+            location = Location(x, y)
+            if gameMap.getSite(location).production > productionMax:
+                productionMax = gameMap.getSite(location).production
+                productionMaxLocation = Location(location.x, location.y)
+    return productionMaxLocation
+
+
 myID, gameMap = getInit()
 # Initialise 
 # Find Production Field values
@@ -23,24 +36,18 @@ for y in range(gameMap.height):
             if gameMap.getSite(location).owner == myID:
                 spawnPoint = location
 
-productionMax = 0
-productionMaxLocation = Location(1,1)
-for y in range(spawnPoint.y-5,spawnPoint.y+5):
-    for x in range(spawnPoint.x-5,spawnPoint.x+5):
-        location = Location(x, y)
-        if gameMap.getSite(location).production > productionMax:
-            productionMax = gameMap.getSite(location).production
-            productionMaxLocation = Location(location.x, location.y)
+productionMaxLocation = productionMax(spawnPoint.x,spawnPoint.y)
+
 
 # productionMaxLocation = Location(spawnPoint.x+3,spawnPoint.y+3)
-logging.info('Spawn Point')
-logging.info(spawnPoint.x)
-logging.info(spawnPoint.y)
-logging.info('Production Max')
-logging.info(productionMax)
-logging.info('Production Max Location')
-logging.info(productionMaxLocation.x)
-logging.info(productionMaxLocation.y)
+# logging.info('Spawn Point')
+# logging.info(spawnPoint.x)
+# logging.info(spawnPoint.y)
+# logging.info('Production Max')
+# logging.info(productionMax)
+# logging.info('Production Max Location')
+# logging.info(productionMaxLocation.x)
+# logging.info(productionMaxLocation.y)
 
 # ProducitonMatrix = [[0 for x in range(w)] for y in range(h)] 
 # for y in range(gameMap.height):
@@ -82,16 +89,16 @@ def directionAtoB(locationA,locationB):
     Ydist = locationA.y - locationB.y
     if (Xdist and Ydist) < 0:
         # Quad = 4
-        direction =( SOUTH if random.random() > 0.5 else EAST)
+        direction =( SOUTH if random.random() > 0.15 else EAST)
     elif (Xdist and Ydist) > 0:
         # Quad = 2
-        direction = (WEST if random.random() > 0.5 else NORTH)
+        direction = (WEST if random.random() > 0.15 else NORTH)
     elif Xdist > 0 and Ydist < 0:
         # Quad = 3
-        direction = (WEST if random.random() > 0.5 else SOUTH)
+        direction = (WEST if random.random() > 0.15 else SOUTH)
     elif Xdist < 0 and Ydist > 0:
         # Quad = 1
-        direction =(EAST if random.random() > 0.5 else NORTH)
+        direction =(EAST if random.random() > 0.15 else NORTH)
     elif Xdist > 0 and Ydist ==0:
         direction = WEST
     elif Xdist < 0 and Ydist ==0:
@@ -127,7 +134,7 @@ def move(location):
     #Move init
     # possibleMoves
 
-    if site.strength < site.production + 5:
+    if site.strength < site.production + 8:
         return Move(location, STILL)
     
     # Is on Max Production Point? 
@@ -138,6 +145,10 @@ def move(location):
     # logging.info(location.x)
     # logging.info(location.y)
     if (location.x == productionMaxLocation.x) and (location.y == productionMaxLocation.y) :
+       
+        # if site.strength >=255:
+            # productionMaxLocation = productionMax(productionMaxLocation.x+randint(1,4),productionMaxLocation.y+randint(1,4))
+
         if site.strength >=150:
             # return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
             return Move(location,(lowestEnemyNeighbour(gameMap,location)))
