@@ -4,11 +4,20 @@ from random import randint
 
 import logging
 
-logging.basicConfig(filename='lolog.log',level=logging.DEBUG)
+logging.basicConfig(filename='lolog2.log',level=logging.DEBUG)
 logging.warning('Watch out!')  # will print a message to the console
 logging.info('I told you so')  # will not print anything
 # logging.info(CARDINALS) 
-
+global count
+count = 0 
+global attackCoolDown
+attackCoolDown= 5
+global attackBool
+attackBool = False
+global attackLocation
+attackLocation= Location(1,1)
+# global productionMaxLocation
+# global meanProductionMaxLocation 
 
 def productionMax(X=1,Y=1,dx=5,dy=5):
     productionMax = 0
@@ -35,7 +44,8 @@ def productionMax(X=1,Y=1,dx=5,dy=5):
 
 
 myID, gameMap = getInit()
-# Initialise 
+
+
 # Find Production Field values
 # Find Spawn Point
 W = gameMap.width
@@ -48,18 +58,18 @@ for y in range(gameMap.height):
             if gameMap.getSite(location).owner == myID:
                 spawnPoint = location
 
-productionMaxLocation,meanProductionMaxLocation = productionMax(spawnPoint.x,spawnPoint.y)
-
+productionMaxLocation,meanProductionMaxLocation = productionMax(spawnPoint.x,spawnPoint.y,gameMap.width/2,gameMap.height/2)
+productionMaxLocation = meanProductionMaxLocation
 
 # productionMaxLocation = Location(spawnPoint.x+3,spawnPoint.y+3)
-# logging.info('Spawn Point')
-# logging.info(spawnPoint.x)
-# logging.info(spawnPoint.y)
-# logging.info('Production Max')
-# logging.info(productionMax)
-# logging.info('Production Max Location')
-# logging.info(productionMaxLocation.x)
-# logging.info(productionMaxLocation.y)
+logging.info('Spawn Point')
+logging.info(spawnPoint.x)
+logging.info(spawnPoint.y)
+logging.info('Production Max')
+logging.info(productionMax)
+logging.info('Production Max Location')
+logging.info(productionMaxLocation.x)
+logging.info(productionMaxLocation.y)
 
 # ProducitonMatrix = [[0 for x in range(w)] for y in range(h)] 
 # for y in range(gameMap.height):
@@ -145,9 +155,29 @@ def move(location):
     # logging.info(site.strength) 
     #Move init
     # possibleMoves
+   
 
     if site.strength < site.production + 8:
         return Move(location, STILL)
+   
+    herp = lowestEnemyNeighbour(gameMap,location)
+    derp = gameMap.getSite(location,herp)
+    if derp.strength <= site.strength:
+        return Move(location, lowestEnemyNeighbour(gameMap,location))
+    
+    # for d in CARDINALS:
+    #     neighbour_site = gameMap.getSite(location, d)
+    #     # make go to lowest square!!! TODO
+    #     if neighbour_site.owner == 2:
+    #     # if neighbour_site.owner != myID and neighbour_site.strength > (site.strength):
+    #         global attackBool
+    #         attackBool = True
+    #         global attackLocation
+    #         attackLocation= gameMap.getLocation(location, d)
+   
+    if attackBool:
+        if site.strength >=250:
+            return Move(location,directionAtoB(location,attackLocation))
     
     # Is on Max Production Point? 
     # logging.info('Production Max Location')
@@ -163,6 +193,12 @@ def move(location):
 
         if site.strength >=150:
             # return Move(location,(STILL if random.random() > 0.5 else randint(1,4)))
+            # count = count + 1
+            # if count >= 8:
+            #     count = 0
+            #     global productionMaxLocation
+            #     global meanProductionMaxLocation 
+            #     productionMaxLocation,meanProductionMaxLocation = productionMax(productionMaxLocation.x+10,productionMaxLocation.y+10,5,5)
             return Move(location,(lowestEnemyNeighbour(gameMap,location)))
         else:
             return Move(location, STILL)
@@ -302,6 +338,9 @@ def IsSquad(gameMap,location):
 #     if squadCount >= randint(3,4):
 #         return True
 #     return False
+# # init loop
+# count = 0
+count = 0 
 
 while True:
     moves = []
@@ -315,6 +354,13 @@ while True:
         SquadMoveOpp = NORTH
     
     SquadMoveOrigional = SquadMove
+    if attackBool:
+        attackCoolDown = attackCoolDown - 1
+        if attackCoolDown <= 0:
+            attackCoolDown = 10
+            global attackBool
+            attackBool = False
+    attackBool = (True if random.random() > 0.50 else False)
     
     for y in range(gameMap.height):
         for x in range(gameMap.width):
@@ -322,4 +368,5 @@ while True:
             if gameMap.getSite(location).owner == myID:
                 # SquadMove = (SquadMoveOrigional if random.random() > 0.15 else (North if random.random() > 0.30 else WEST))
                 moves.append(move(location))
+   
     sendFrame(moves)

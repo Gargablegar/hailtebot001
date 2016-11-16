@@ -26,7 +26,7 @@ myID, gameMap = getInit()
 # logging.info('Ayylmao_lets')
 
 
-sendInit("ENEMY")
+sendInit("Ayylmao_lets go WESTbot")
 # https://halite.io/basics_improve_random.php
 # logging.info(gameMap)
 # Move function, that does not move if at 0 strength
@@ -35,13 +35,13 @@ def move(location):
     site = gameMap.getSite(location)
     SquadFlag = IsSquad(location)
 
-    # if site.strength < site.production + 4:
-    #     return Move(location, STILL)
-    # if SquadFlag == False and site.strength > 50:
-    #     # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
-    #     return Move(location,RndDirection())   
-    # if SquadFlag == True and site.strength > 50:
-    #     return Move(location,WEST)   
+    if site.strength < site.production + 4:
+        return Move(location, STILL)
+    if SquadFlag == False and site.strength > 50:
+        # return Move(location, EAST if random.random() > 0.5 else SOUTH)   
+        return Move(location,RndDirection())   
+    if SquadFlag == True and site.strength > 50:
+        return Move(location,WEST)   
 
     for d in CARDINALS:
         neighbour_site = gameMap.getSite(location, d)

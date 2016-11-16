@@ -1,0 +1,1 @@
+.\halite.exe -d "20 20" "python Hydra.py" "python RandomBot.py"
