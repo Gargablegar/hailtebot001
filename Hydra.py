@@ -61,15 +61,17 @@ def directionAtoB(locationA,locationB):
 # main move function
 def move(location):
     site = gameMap.getSite(location)
-    location2 = Location(1,1)
-    if site.strength < site.production + 8:
+    
+    if site.strength < site.production + 15:
         return Move(location, STILL)
-    else:
-        # appendLog(spawnPoint.x)
-        # appendLog(spawnPoint.y)
+    
+    # if gameData.getBlockType(productionMaxLocation) == 1:
+    #     enemyLocation = gameData.checkEnemy(location,r=10)
+    #     if enemyLocation != location:
+    #         return Move(location,directionAtoB(location,enemyLocation))
+    # return Move(location,RndDirection())
 
-        # appendLog(location2.x)
-        # appendLog(location2.y)
+    else:
         return Move(location,directionAtoB(location,productionMaxLocation))
         # return Move(location,RndDirection())
 
@@ -108,7 +110,7 @@ class gameData:
                     self.spawnPoint = self.location
                     self.blockTypeMatrix[self.spawnPoint.y,self.spawnPoint.x] = 1
                 if self.gameMap.getSite(self.location).owner != myID:
-                    self.blockTypeMatrix[y,x] = self.gameMap.getSite(self.location).owner
+                    self.blockTypeMatrix[self.spawnPoint.y,self.spawnPoint.x]= self.gameMap.getSite(self.location).owner
                 self.ProductionMatrix[y,x]=self.gameMap.getSite(self.location).production
 
         f = open('HYDRA_TXT_LOG.txt','a+')
@@ -123,6 +125,30 @@ class gameData:
 
     def getBlockTypes(self):
         return self.blockTypeMatrix
+    def getBlockType(self,location):
+        return self.blockTypeMatrix[location.y,location.x]
+    def convert(self,A,B):
+        array =[]
+        for i in range ((max(A,B))-(min(A,B))):
+            array = 
+        return array
+    def checkEnemy(self,location,r=2):
+        x = location.x
+        y = location.y
+        minDistance = r*10
+        enemyLocation = location
+
+        for y in range(y-r,y+r):
+            for x in range(x-r,x+r):
+                if gameMap.inBounds(Location(x,y)):
+                    site = gameMap.getSite(Location(x,y))
+                    if site.owner > 1:
+                        if gameMap.getDistance(location,Location(x,y)) < minDistance:
+                            minDistance = gameMap.getDistance(location,Location(x,y)) 
+                            enemyLocation = Location(x,y)
+                
+        # np.where(self.blockTypeMatrix[] > 1)
+        return enemyLocation
 
     def updateGameMap(self,gameMap):
         self.gameMap = gameMap
@@ -183,6 +209,7 @@ class gameData:
     def setBlockType(self,location=Location(1,1),blockType=0):
         self.blockTypeMatrix[location.y,location.x] = blockType
         return
+
     def updateBlockType(self):
         return
 # INIT GAME
