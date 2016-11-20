@@ -33,3 +33,5 @@ productionField = [[0 for x in range(W)] for y in range(H)]
 
 print productionField
 
+XX = [1,2,3,4,5,6,7]
+print XX[-2]

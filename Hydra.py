@@ -65,11 +65,12 @@ def move(location):
     if site.strength < site.production + 15:
         return Move(location, STILL)
     
-    # if gameData.getBlockType(productionMaxLocation) == 1:
-    #     enemyLocation = gameData.checkEnemy(location,r=10)
-    #     if enemyLocation != location:
-    #         return Move(location,directionAtoB(location,enemyLocation))
-    # return Move(location,RndDirection())
+    if gameData.getBlockType(productionMaxLocation) == 1:
+        enemyLocation = gameData.checkEnemy(location,r=2)
+        if enemyLocation != location:
+            return Move(location,directionAtoB(location,enemyLocation))
+        # return Move(location,RndDirection())
+        return Move(location,directionAtoB(location,productionMaxLocation))
 
     else:
         return Move(location,directionAtoB(location,productionMaxLocation))
@@ -96,6 +97,8 @@ class gameData:
         self.ProductionMatrix = np.zeros((self.gameMap.width,self.gameMap.height))
         # Spawn point 
         self.spawnPoint = Location(1,1)
+        self.HeightY = self.gameMap.height
+        self.WidthX = self.gameMap.width
 
         # self.productionMaxLocation
         # self.meanProductionMaxLocation
@@ -130,7 +133,7 @@ class gameData:
     def convert(self,A,B):
         array =[]
         for i in range ((max(A,B))-(min(A,B))):
-            array = 
+            array = []
         return array
     def checkEnemy(self,location,r=2):
         x = location.x
@@ -140,12 +143,27 @@ class gameData:
 
         for y in range(y-r,y+r):
             for x in range(x-r,x+r):
-                if gameMap.inBounds(Location(x,y)):
-                    site = gameMap.getSite(Location(x,y))
+                
+                # Convert Y with wraping
+                if (y-r)<0:
+                    Y = y + self.HeightY  
+                elif (y+r)>self.HeightY:
+                    Y=(y+r)-self.HeightY
+                else:
+                    Y=y
+                # Convert X with wraping
+                if (x-r)<0:
+                    X = x + self.WidthX
+                elif (x+r)>self.WidthX:
+                    X=(x+r)-self.HeightY
+                else:
+                    X=x
+                if gameMap.inBounds(Location(X,Y)):
+                    site = gameMap.getSite(Location(X,Y))
                     if site.owner > 1:
-                        if gameMap.getDistance(location,Location(x,y)) < minDistance:
-                            minDistance = gameMap.getDistance(location,Location(x,y)) 
-                            enemyLocation = Location(x,y)
+                        if gameMap.getDistance(location,Location(X,Y)) < minDistance:
+                            minDistance = gameMap.getDistance(location,Location(X,Y)) 
+                            enemyLocation = Location(X,Y)
                 
         # np.where(self.blockTypeMatrix[] > 1)
         return enemyLocation

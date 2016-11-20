@@ -50,6 +50,7 @@ myID, gameMap = getInit()
 # Find Spawn Point
 W = gameMap.width
 H = gameMap.height
+
 # productionField = [[0 for x in range(W)] for y in range(H)]
 for y in range(gameMap.height):
         for x in range(gameMap.width):
